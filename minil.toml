@@ -1,0 +1,6 @@
+name = "Sereal-Store"
+authors = ['Gelu Lupaş <gvl@cpan.org>']
+authority = "cpan:GVL"
+license = "mit"
+readme_from = "lib/Sereal/Store.pm"
+abstract_from = "lib/Sereal/Store.pm"
