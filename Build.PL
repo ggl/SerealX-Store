@@ -23,8 +23,8 @@ my %args = (
         'Module::Build' => 0.38,
     },
 
-    name            => 'Sereal-Store',
-    module_name     => 'Sereal::Store',
+    name            => 'SerealX-Store',
+    module_name     => 'SerealX::Store',
     allow_pureperl => 0,
 
     script_files => [glob('script/*'), glob('bin/*')],

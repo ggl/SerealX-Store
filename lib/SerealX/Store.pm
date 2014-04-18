@@ -1,4 +1,4 @@
-package Sereal::Store;
+package SerealX::Store;
 # ABSTRACT: Sereal based persistence for Perl data structures
 our $VERSION = '0.001';
 
