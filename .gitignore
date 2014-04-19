@@ -1,0 +1,15 @@
+/SerealX-Store-*
+.*
+*~
+*.bak
+*.old
+.build
+.prove
+.fslckout
+Build
+blib
+_build
+TODO
+!META.json
+META.yml
+MYMETA.*

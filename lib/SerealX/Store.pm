@@ -8,6 +8,7 @@ use warnings;
 
 use Sereal::Encoder;
 use Sereal::Decoder;
+use Data::Dumper;
 
 # Constructor
 sub new {
@@ -58,3 +59,80 @@ sub retrieve {
 	
 	return $decoded;
 }
+
+1;
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+SerealX::Store - Sereal based persistence for Perl data structures
+
+=head1 SYNOPSIS
+
+  use SerealX::Store;
+
+  my $st = SerealX::Store->new();
+  my $data = {
+    foo => 1,
+    bar => 'nut',
+    baz => [1, 'barf'],
+    qux => { a => 1, b => 'ugh' },
+    ugh => undef
+  };
+  $st->store($data, "/tmp/dummy");
+  my $decoded = $st->retrieve("/tmp/dummy");
+
+=head1 DESCRIPTION
+
+This module serializes Perl data structures using L<Sereal::Encoder> and stores
+them on disk for the purpose of retrieving and using them at a later time. At
+retrieval L<Sereal::Decoder> is used to deserialize the data.
+
+The rationale behind this module is to eventually provide a L<Storable>
+compatible API, while using the excellent L<Sereal> protocol for the heavy
+lifting.
+
+=head1 METHODS
+
+=head2 new
+
+Constructor used to instantiate the object.
+
+=head2 store
+
+Given a Perl data structure and a path as arguments, will encode the data
+structure into a binary string using L<Sereal::Encoder> and write it to a file
+at the specified path. The method will return a true value upon success or
+croak if no path is given or if any other errors are encountered.
+  
+  $st->store($data, "/tmp/dummy");
+  
+=head2 retrieve
+
+Given a path as argument, will retrieve the data from the file at the specified
+path, deserialize it using L<Sereal::Decoder> and return it. The method will
+croak upon failure.
+
+  $st->retrieve($data, "/tmp/dummy");
+
+=head1 SEE ALSO
+
+L<Sereal>, L<Storable>
+
+=head1 AUTHOR
+
+Gelu Lupaş <gvl@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+ 
+Copyright (c) 2013-2014 the Log::Any::Adapter::Handler L</AUTHOR> as listed
+above.
+ 
+This is free software, licensed under:
+ 
+  The MIT License (MIT)
+
+=cut

@@ -59,17 +59,14 @@
    "release_status" : "unstable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ggl/Serial-Store/issues"
+         "web" : "https://github.com/ggl/SerealX-Store/issues"
       },
-      "homepage" : "https://github.com/ggl/Serial-Store",
+      "homepage" : "https://github.com/ggl/SerealX-Store",
       "repository" : {
-         "url" : "https://github.com/ggl/Serial-Store.git",
-         "web" : "https://github.com/ggl/Serial-Store"
+         "url" : "https://github.com/ggl/SerealX-Store.git",
+         "web" : "https://github.com/ggl/SerealX-Store"
       }
    },
    "version" : "0.001",
-   "x_authority" : "cpan:GVL",
-   "x_contributors" : [
-      "Gelu Lupaş <gelu.lupas@gmail.com>"
-   ]
+   "x_authority" : "cpan:GVL"
 }
