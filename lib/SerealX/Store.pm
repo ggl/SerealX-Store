@@ -8,7 +8,6 @@ use warnings;
 
 use Sereal::Encoder;
 use Sereal::Decoder;
-use Data::Dumper;
 
 # Constructor
 sub new {
@@ -25,6 +24,7 @@ sub store {
 		$self->{encoder} = Sereal::Encoder->new();
 	}
 	open(my $fh, ">", $path) or die "Cannot open file $path: $!";
+	binmode $fh;
 	print $fh $self->{encoder}->encode($data)
 		or die "Cannot write fo $path: $!";
 	close $fh or die "Cannot close $path: $!";
@@ -40,10 +40,21 @@ sub retrieve {
 		$self->{decoder} = Sereal::Decoder->new();
 	}
 	open(my $fh, "<", $path) or die "Cannot open file $path: $!";
-	## TODO: buffering
-	sysread($fh, my $data, (stat($path))[7]);
-	$self->{decoder}->decode($data, my $decoded);
+	binmode $fh;
+	my $data;
+	if (my $size = -s $fh) {
+		my ($pos, $read) = 0;
+		while ($pos < $size) {
+			defined($read = read($fh, $data, $size - $pos, $pos))
+				or die "Cannot read file $path: $!";
+			$pos += $read;
+		}
+	}
+	else {
+		$data = <$fh>;
+	}
 	close $fh or die "Cannot close $path: $!";
+	$self->{decoder}->decode($data, my $decoded);
 	
 	return $decoded;
 }
