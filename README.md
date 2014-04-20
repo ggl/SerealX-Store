@@ -20,8 +20,8 @@ SerealX::Store - Sereal based persistence for Perl data structures
 # DESCRIPTION
 
 This module serializes Perl data structures using [Sereal::Encoder](https://metacpan.org/pod/Sereal::Encoder) and stores
-them on disk for the purpose of retrieving and using them at a later time. At
-retrieval [Sereal::Decoder](https://metacpan.org/pod/Sereal::Decoder) is used to deserialize the data.
+them on disk for the purpose of retrieving them at a later time. At retrieval
+[Sereal::Decoder](https://metacpan.org/pod/Sereal::Decoder) is used to deserialize the data.
 
 The rationale behind this module is to eventually provide a [Storable](https://metacpan.org/pod/Storable)
 compatible API, while using the excellent [Sereal](https://metacpan.org/pod/Sereal) protocol for the heavy
@@ -31,7 +31,23 @@ lifting.
 
 ## new
 
-Constructor used to instantiate the object.
+Constructor used to instantiate the object. Optionally takes a hash reference
+as the frist parameter. The following options are recognised:
+
+- encoder
+
+    Options to pass to the Sereal::Encoder object constructor. Its value should be
+    a hash reference containing any of the options that influence the behaviour of
+    the encoder, as described by its documentation. When this is the case, the
+    encoder object will be instantiated in the constructor, otherwise instantiation
+    would only happen when the `store` method is called for the first time.
+
+- decoder
+
+    Options to pass to the Sereal::Decoder object constructor. Its format and
+    behaviour is equivalent to the `encoder` option above. If this key does not
+    exist, the decoder object will only be instantiated when the `retrieve` method
+    is called for the first time.
 
 ## store
 

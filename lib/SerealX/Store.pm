@@ -1,6 +1,6 @@
 package SerealX::Store;
 # ABSTRACT: Sereal based persistence for Perl data structures
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use 5.008001;
 use strict;
@@ -8,12 +8,19 @@ use warnings;
 
 use Sereal::Encoder;
 use Sereal::Decoder;
-use Data::Dumper;
 
 # Constructor
 sub new {
-	my $class = shift;
+	my ($class, $params) = @_;
+	
 	my $self = {};
+	if (ref $params->{encoder} eq 'HASH') {
+		$self->{encoder} = Sereal::Encoder->new($params->{encoder});
+	}
+	if (ref $params->{decoder} eq 'HASH') {
+		$self->{decoder} = Sereal::Decoder->new($params->{decoder});
+	}
+	
 	return bless $self, $class;
 }
 
@@ -88,8 +95,8 @@ SerealX::Store - Sereal based persistence for Perl data structures
 =head1 DESCRIPTION
 
 This module serializes Perl data structures using L<Sereal::Encoder> and stores
-them on disk for the purpose of retrieving and using them at a later time. At
-retrieval L<Sereal::Decoder> is used to deserialize the data.
+them on disk for the purpose of retrieving them at a later time. At retrieval
+L<Sereal::Decoder> is used to deserialize the data.
 
 The rationale behind this module is to eventually provide a L<Storable>
 compatible API, while using the excellent L<Sereal> protocol for the heavy
@@ -99,7 +106,27 @@ lifting.
 
 =head2 new
 
-Constructor used to instantiate the object.
+Constructor used to instantiate the object. Optionally takes a hash reference
+as the frist parameter. The following options are recognised:
+
+=over 4
+
+=item encoder
+
+Options to pass to the Sereal::Encoder object constructor. Its value should be
+a hash reference containing any of the options that influence the behaviour of
+the encoder, as described by its documentation. When this is the case, the
+encoder object will be instantiated in the constructor, otherwise instantiation
+would only happen when the C<store> method is called for the first time.
+
+=item decoder
+
+Options to pass to the Sereal::Decoder object constructor. Its format and
+behaviour is equivalent to the C<encoder> option above. If this key does not
+exist, the decoder object will only be instantiated when the C<retrieve> method
+is called for the first time.
+
+=back
 
 =head2 store
 
