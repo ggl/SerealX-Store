@@ -1,6 +1,6 @@
 package SerealX::Store;
 # ABSTRACT: Sereal based persistence for Perl data structures
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use 5.008001;
 use strict;
@@ -27,15 +27,15 @@ sub new {
 sub store {
 	my ($self, $data, $path) = @_;
 
-	die "No handle or path specified" unless $path;
+	die "No file specified" unless $path;
 	if (ref $self->{encoder} ne 'Sereal::Encoder') {
 		$self->{encoder} = Sereal::Encoder->new();
 	}
+	my $encoded = $self->{encoder}->encode($data);
 	open(my $fh, ">", $path) or die "Cannot open file $path: $!";
 	binmode $fh;
-	print $fh $self->{encoder}->encode($data)
-		or die "Cannot write fo $path: $!";
-	close $fh or die "Cannot close $path: $!";
+	print $fh $encoded	or die "Cannot write to file $path: $!";
+	close $fh or die "Cannot close file $path: $!";
 
 	return 1;
 }
@@ -43,7 +43,7 @@ sub store {
 sub retrieve {
 	my ($self, $path) = @_;
 
-	die "No handle or path specified" unless $path;
+	die "No file specified" unless $path;
 	if (ref $self->{decoder} ne 'Sereal::Decoder') {
 		$self->{decoder} = Sereal::Decoder->new();
 	}
@@ -61,7 +61,7 @@ sub retrieve {
 	else {
 		$data = <$fh>;
 	}
-	close $fh or die "Cannot close $path: $!";
+	close $fh or die "Cannot close file $path: $!";
 	$self->{decoder}->decode($data, my $decoded);
 	
 	return $decoded;
@@ -98,9 +98,8 @@ This module serializes Perl data structures using L<Sereal::Encoder> and stores
 them on disk for the purpose of retrieving them at a later time. At retrieval
 L<Sereal::Decoder> is used to deserialize the data.
 
-The rationale behind this module is to eventually provide a L<Storable>
-compatible API, while using the excellent L<Sereal> protocol for the heavy
-lifting.
+The rationale behind this module is to eventually provide a L<Storable> like
+API, while using the excellent L<Sereal> protocol for the heavy lifting.
 
 =head1 METHODS
 
@@ -122,26 +121,25 @@ would only happen when the C<store> method is called for the first time.
 =item decoder
 
 Options to pass to the Sereal::Decoder object constructor. Its format and
-behaviour is equivalent to the C<encoder> option above. If this key does not
-exist, the decoder object will only be instantiated when the C<retrieve> method
-is called for the first time.
+behaviour is equivalent to the C<encoder> option above. If its value is not a
+hash reference, the decoder object will only be instantiated when the
+C<retrieve> method is called for the first time.
 
 =back
 
 =head2 store
 
 Given a Perl data structure and a path as arguments, will encode the data
-structure into a binary string using L<Sereal::Encoder> and write it to a file
-at the specified path. The method will return a true value upon success or
-croak if no path is given or if any other errors are encountered.
+structure into a binary string and write it to a file at the specified path.
+The method will return a true value upon success or croak if no path is given
+or if any other errors are encountered.
   
   $st->store($data, "/tmp/dummy");
   
 =head2 retrieve
 
 Given a path as argument, will retrieve the data from the file at the specified
-path, deserialize it using L<Sereal::Decoder> and return it. The method will
-croak upon failure.
+path, deserialize and return it. The method will croak upon failure.
 
   $st->retrieve($data, "/tmp/dummy");
 
@@ -155,7 +153,7 @@ Gelu Lupaş <gvl@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
  
-Copyright (c) 2013-2014 the Log::Any::Adapter::Handler L</AUTHOR> as listed
+Copyright (c) 2013-2014 the SerealX::Store L</AUTHOR> as listed
 above.
  
 This is free software, licensed under:
