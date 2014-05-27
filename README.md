@@ -35,15 +35,15 @@ as the frist parameter. The following options are recognised:
 
 - encoder
 
-    Options to pass to the Sereal::Encoder object constructor. Its value should be
-    a hash reference containing any of the options that influence the behaviour of
-    the encoder, as described by its documentation. When this is the case, the
+    Options to pass to the [Sereal::Encoder](https://metacpan.org/pod/Sereal::Encoder) object constructor. Its value should
+    be a hash reference containing any of the options that influence the behaviour
+    of the encoder, as described by its documentation. When this is the case, the
     encoder object will be instantiated in the constructor, otherwise instantiation
     would only happen when the `store` method is called for the first time.
 
 - decoder
 
-    Options to pass to the Sereal::Decoder object constructor. Its format and
+    Options to pass to the [Sereal::Decoder](https://metacpan.org/pod/Sereal::Decoder) object constructor. Its format and
     behaviour is equivalent to the `encoder` option above. If its value is not a
     hash reference, the decoder object will only be instantiated when the
     `retrieve` method is called for the first time.

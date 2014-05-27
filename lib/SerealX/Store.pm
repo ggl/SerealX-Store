@@ -12,7 +12,7 @@ use Sereal::Decoder;
 # Constructor
 sub new {
 	my ($class, $params) = @_;
-	
+
 	my $self = {};
 	if (ref $params->{encoder} eq 'HASH') {
 		$self->{encoder} = Sereal::Encoder->new($params->{encoder});
@@ -20,7 +20,7 @@ sub new {
 	if (ref $params->{decoder} eq 'HASH') {
 		$self->{decoder} = Sereal::Decoder->new($params->{decoder});
 	}
-	
+
 	return bless $self, $class;
 }
 
@@ -37,7 +37,7 @@ sub store {
 	print $fh $encoded	or die "Cannot write to file $path: $!";
 	close $fh or die "Cannot close file $path: $!";
 
-	return 1;
+	return length $encoded;
 }
 
 sub retrieve {
@@ -62,9 +62,42 @@ sub retrieve {
 		$data = <$fh>;
 	}
 	close $fh or die "Cannot close file $path: $!";
-	$self->{decoder}->decode($data, my $decoded);
-	
-	return $decoded;
+	if ($self->{decoder}->looks_like_sereal($data)) {
+		$self->{decoder}->decode($data, my $decoded);
+		return $decoded;
+	}
+
+	return undef;
+}
+
+sub store_fd {
+	my ($self, $data, $fh) = @_;
+
+	die "No file handle specified" unless $fh;
+	if (ref $self->{encoder} ne 'Sereal::Encoder') {
+		$self->{encoder} = Sereal::Encoder->new();
+	}
+	my $encoded = $self->{encoder}->encode($data);
+	binmode $fh;
+	print $fh $encoded."\n" or die "Cannot write to file handle: $!";
+
+	return length $encoded;
+}
+
+sub fd_retrieve {
+	my ($self, $fh) = @_;
+
+	die "No file specified" unless $fh;
+	if (ref $self->{decoder} ne 'Sereal::Decoder') {
+		$self->{decoder} = Sereal::Decoder->new();
+	}
+	binmode $fh;
+	if ($self->{decoder}->looks_like_sereal(my $buf = <$fh>)) {
+		$self->{decoder}->decode($buf, my $decoded);
+		return $decoded;
+	}
+
+	return undef;
 }
 
 1;
@@ -112,15 +145,15 @@ as the frist parameter. The following options are recognised:
 
 =item encoder
 
-Options to pass to the Sereal::Encoder object constructor. Its value should be
-a hash reference containing any of the options that influence the behaviour of
-the encoder, as described by its documentation. When this is the case, the
+Options to pass to the L<Sereal::Encoder> object constructor. Its value should
+be a hash reference containing any of the options that influence the behaviour
+of the encoder, as described by its documentation. When this is the case, the
 encoder object will be instantiated in the constructor, otherwise instantiation
 would only happen when the C<store> method is called for the first time.
 
 =item decoder
 
-Options to pass to the Sereal::Decoder object constructor. Its format and
+Options to pass to the L<Sereal::Decoder> object constructor. Its format and
 behaviour is equivalent to the C<encoder> option above. If its value is not a
 hash reference, the decoder object will only be instantiated when the
 C<retrieve> method is called for the first time.
